@@ -76,11 +76,8 @@ def api_checks(
 
 
 def main():
-    emails = ["api@cadreon.com", "wmt_api_matterkind@cadreon.com"]
-
     email = input("\nPlease provide email address to validate : ")
 
-    emails.insert(0, email)
     start = email.find("i_") + 2
     end = email.find("@")
     partnerId = email[start:end]
@@ -90,12 +87,22 @@ def main():
     else:
         partnerId = input(f"Please provide ID for {email} : ")
 
-    # Now we check to make sure that the provided email address
-    # and api@cadreon.com have access
+    pword = pwi.pwinput(prompt=f"Provide the password for address {email} : ")
 
+    stat_code, result, partner_name, total_count = api_checks(email, pword, partnerId)
+
+    if stat_code == 200:
+        print("Successful - see below\n")
+        output_result(result, email, partner_name, partnerId, total_count)
+    else:
+        print("Unsuccessful - see above for details")
+        print(f"Returned JSON:\n==============\n{result}")
+
+    # Now we check to make sure that api@cadreon.com/wmt_api_matterkind@cadreon.com has access
+
+    print("\n\nNow checking if RNB Credentials have access to this ID")
+    emails = ("api@cadreon.com", "wmt_api_matterkind@cadreon.com")
     for email in emails:
-
-        print(f"\nChecking connectivity at Walmart for {email}")
         pword = pwi.pwinput(prompt=f"\nProvide the password for address {email}:\n\t")
 
         stat_code, result, partner_name, total_count = api_checks(
@@ -103,10 +110,10 @@ def main():
         )
 
         if stat_code == 200:
-            print("\nSuccessful - see below\n")
-            output_result(result, email, partner_name, partnerId, total_count)
+            print("Successful - see below\n\n")
+            output_result(result, email, partner_name, partnerId)
         else:
-            print("\nUnsuccessful - see above for details")
+            print("Unsuccessful - see above for details")
             print(f"Result of call:\n==============\n{result}\n")
 
 
